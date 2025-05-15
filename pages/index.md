@@ -14,6 +14,17 @@ title: Welcome to Evidence
   group by category
 ```
 
+```sql doctors
+SELECT COUNT(*)
+FROM chat.doctors
+```
+
+```sql messages
+SELECT *
+FROM chat.messages
+LIMIT 10;
+```
+
 <Dropdown data={categories} name=category value=category>
     <DropdownOption value="%" valueLabel="All Categories"/>
 </Dropdown>
