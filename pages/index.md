@@ -72,10 +72,10 @@ ORDER BY week
 </DataTable>
 
 ## Key Insights
-- Volume scale: The platform facilitates over 43,000 messages sent by doctors on average every week, demonstrating significant adoption.
-- Positive growth trend: We observe a clear upward trajectory in the last 3 weeks of the analysis period (Feb 22-Mar 8), with read messages increasing from ~31,000 to ~35,000 weekly.
+- **Volume scale**: The platform facilitates over 43,000 messages sent by doctors on average every week, demonstrating significant adoption.
+- **Positive growth trend**: We observe a clear upward trajectory in the last 3 weeks of the analysis period (Feb 22-Mar 8), with read messages increasing from ~31,000 to ~35,000 weekly.
 
-There's however a communication gap: approximately 25-29% of messages sent by doctors go unread by patients. This represents a clear opportunity for improvement:
+There's however a communication gap: approximately **25-29% of messages sent by doctors go unread by patients**. This represents a clear opportunity for improvement:
 
 <BarChart 
     data={nsm} 
@@ -120,7 +120,7 @@ ORDER BY week
 </Details>
 
 # Feature Adoption and Usage Patterns
-Analysis of weekly chat usage reveals that while the feature has gained traction among doctors, there remains significant opportunity for deeper integration into their workflows.
+Analysis of weekly chat usage reveals that while the feature has gained traction among doctors, there remains significant **opportunity for deeper integration into their workflows**:
 
 ```sql active_week
 WITH all_doctors AS (
@@ -163,17 +163,15 @@ ORDER BY a.week
     chartAreaHeight=350
 />
 
-## Key Insights:
-- Consistent weekly engagement: Between 27-29% of doctors actively use the chat feature in any given week, representing approximately 8,200-9,100 active doctors.
-- Modest growth trajectory: weekly usage increased from 26.9% in early January to a peak of 29.0% in February, demonstrating positive momentum during the first half of the analysis period.
-- Stable engagement: Despite the total doctor base growing from 30,530 to 31,818 over these 10 weeks, the percentage of active users remained relatively stable, suggesting successful onboarding of new doctors to the feature.
+## Key Insights
+- **Consistent weekly usage**: Between 27-29% of doctors actively use the chat feature in any given week, representing approximately 8,200-9,100 active doctors.
+- **Stable engagement**: Despite the total doctor base growing from 30,530 to 31,818 over these 10 weeks, the percentage of active users remained relatively stable, suggesting successful onboarding of new doctors to the feature.
 
-## Initial Observations:
+## Initial Observations
+- **Adoption oppportunity**: With 1 in 4 doctors using chat weekly, there is significant potential to expand usage across the platform.
+- **Consistency**: The stability of weekly usage suggests the feature has found a core user base but may need enhancements to appeal to a broader audience.
 
-- Adoption ppportunity: With roughly one in four doctors using chat weekly, there is significant potential to expand usage across the platform.
-- Consistency: The stability of weekly usage suggests the feature has found a core user base but may need enhancements to appeal to a broader audience.
-- Next analysis steps: To better understand usage patterns, we'll next examine how chat adoption varies across different doctor specializations, which will help identify targeted growth opportunities.
-
+To better understand usage patterns, we'll next examine how chat adoption varies across different doctor specializations, which will help identify targeted growth opportunities.
 
 <Details title="SQL query used">
 
@@ -265,23 +263,44 @@ ORDER BY total_doctors DESC
     y=1.8
     label="Avg weekly bookings per doctor"
   />
+  <ReferenceArea 
+    xMin=0.62
+    xMax=0.8
+    yMin=2.5
+    yMax=4
+    label="High-impact Specializations" 
+    color="positive"
+    border={true}
+    labelPosition="center"
+  />
+
+  <ReferenceArea 
+    xMin=0.3
+    xMax=0.6
+    yMin=0.5
+    yMax=1.7
+    label="Growth Opportunities" 
+    color="info"
+    border={true}
+    labelPosition="center"
+  />
 </BubbleChart>
 
 ## Key Insights
-- Wide usage variation: Chat usage rates range dramatically across specializations, from as low as 8.7% (Radiology) to as high as 74.0% (Proctology), with an overall average of 60.2%.
-- Practice pattern influence: Specializations requiring ongoing patient relationships (Endocrinology 73.5%, Obsterics and Gyneacology 70.7%) show much higher usage than those focused on one-time diagnostics (Radiology 8.7%).
+- **Wide usage variation**: Chat usage rates range dramatically across specializations, from as low as 8.7% (Radiology) to as high as 74.0% (Proctology), with an overall average of 60.2%.
+- **Practice pattern influence**: Specializations requiring ongoing patient relationships (Endocrinology 73.5%, Obsterics and Gyneacology 70.7%) show much higher usage than those focused on one-time diagnostics (Radiology 8.7%).
 
 ### High-impact Specializations
 Several large specializations show both high adoption and strong booking performance:
-- Dermatology & Venereology: 66.3% usage, 3.84 bookings/doctor (highest booking rate)
-- Obstetrics & Gynecology: 70.7% usage, 3.40 bookings/doctor (3,010 doctors)
-- Pulmonology: 64.6% usage, 3.46 bookings/doctor
+- **Dermatology & Venereology**: 66.3% usage, 3.84 bookings/doctor (highest booking rate)
+- **Obstetrics & Gynecology**: 70.7% usage, 3.40 bookings/doctor (3,010 doctors)
+- **Pulmonology**: 64.6% usage, 3.46 bookings/doctor
 
 ### Growth Opportunities
 Several specializations with significant doctor numbers show below-average chat usage:
-- General Medicine: 34.3% usage (lowest among major specialties), 1.04 bookings/doctor (1,187 doctors)
-- Orthopedics: 60.7% usage, 1.71 bookings/doctor (1,772 doctors)
-- Ophthalmology: 56.5% usage, 1.95 bookings/doctor (1,606 doctors)
+- **General Medicine**: 34.3% usage (lowest among major specialties), 1.04 bookings/doctor (1,187 doctors)
+- **Orthopedics**: 60.7% usage, 1.71 bookings/doctor (1,772 doctors)
+- **Ophthalmology**: 56.5% usage, 1.95 bookings/doctor (1,606 doctors)
 
 <Details title="SQL query used">
 
@@ -367,19 +386,19 @@ ORDER BY user_group
 </DataTable>
 
 ## Key Insights
-- Clear Value Proposition: Doctors who use chat receive approximately 8.5x more bookings than those who don't, demonstrating a strong business case for the feature.
-- Revenue Driver: Chat users (+61% of doctors) account for nearly 94% of all bookings on the platform, making this feature a critical revenue driver.
+- **Clear value proposition**: Doctors who use chat receive approximately 8.5x more bookings than those who don't, demonstrating a strong business case for the feature.
+- **Revenue driver**: Chat users (+61% of doctors) account for nearly 94% of all bookings on the platform, making this feature a critical revenue driver.
 
 # Strategic Recommendations
 
 ## This quarter
-1. Reduce Unread Rate: Implement improved notification systems to reduce the 25-29% unread rate.
-2. Targeted Adoption Drive: Focus on high-volume, low-adoption specializations like General Medicine (34% adoption, 1,187 doctors).
+- **Reduce Unread Rate**: Implement improved notification systems to reduce the 25-29% unread rate.
+- **Targeted adoption**: Focus on high-volume, low-adoption specializations like General Medicine (34% adoption, 1,187 doctors).
 
 ## Next quarter
-- Specialization-Specific Features: Develop templates and workflows tailored to the needs of different medical specialties.
-- Re-engagement Campaign: Target the doctors who tried chat but don't use it weekly.
-- Value Communication: Highlight the booking correlation in marketing materials to drive adoption.
+- **Specialization-specific features**: Develop templates and workflows tailored to the needs of different medical specialties.
+- **Re-engagement campaign**: Target the doctors who tried chat but don't use it weekly.
+- **Value communication**: Highlight the booking correlation in marketing materials to drive adoption.
 
 # Conclusion
 The chat feature demonstrates strong business value with a clear correlation to increased bookings. Our primary challenges are:
@@ -387,3 +406,5 @@ The chat feature demonstrates strong business value with a clear correlation to 
 - Expanding consistent usage beyond the current 27-29% weekly active users
 - Reducing the 25-29% unread rate to improve communication effectiveness
 - Addressing specialty-specific needs to increase adoption in underperforming segments
+
+I've made this app using [Evidence.dev](https://evidence.dev/). Code is on [GitHub](https://github.com/jeremyrieunier/docplanner). And this is mon [Linkedin profile](https://www.linkedin.com/in/jeremyrieunier/).
