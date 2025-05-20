@@ -39,10 +39,10 @@ WITH messages_from_doctors AS (
 SELECT
   week,
   SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) AS ⭐_doctor_messages_read_by_patients,
-  (SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) - LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week)) / LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week) AS ⭐_wow_growth,
+  ROUND((SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) - LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week)) / LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week), 2) AS ⭐_wow_growth,
   SUM(CASE WHEN message_status = 'not read' THEN message_count ELSE 0 END) AS doctor_messages_not_read,
   SUM(message_count) AS total_messages_sent_by_doctor,
-  SUM(message_count)/COUNT(DISTINCT doctor_composite_id) AS avg_messages_sent_per_doctor,
+  SUM(message_count) / COUNT(DISTINCT doctor_composite_id) AS avg_messages_sent_per_doctor,
   ROUND(SUM(CASE WHEN message_status = 'not read' THEN message_count ELSE 0 END) / SUM(message_count), 2) AS patient_unread_rate,
 FROM messages_from_doctors
 GROUP BY week
@@ -106,11 +106,11 @@ WITH messages_from_doctors AS (
 
 SELECT
   week,
-  SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) AS nsm_doctor_messages_read_by_patients,
-  (SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) - LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week)) / LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week) AS nsm_wow_growth,
+  SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) AS ⭐_doctor_messages_read_by_patients,
+  ROUND((SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END) - LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week)) / LAG(SUM(CASE WHEN message_status = 'read' THEN message_count ELSE 0 END)) OVER (ORDER BY week), 2) AS ⭐_wow_growth,
   SUM(CASE WHEN message_status = 'not read' THEN message_count ELSE 0 END) AS doctor_messages_not_read,
   SUM(message_count) AS total_messages_sent_by_doctor,
-  SUM(message_count)/COUNT(DISTINCT doctor_composite_id) AS avg_messages_sent_per_doctor,
+  SUM(message_count) / COUNT(DISTINCT doctor_composite_id) AS avg_messages_sent_per_doctor,
   ROUND(SUM(CASE WHEN message_status = 'not read' THEN message_count ELSE 0 END) / SUM(message_count), 2) AS patient_unread_rate,
 FROM messages_from_doctors
 GROUP BY week
@@ -197,7 +197,7 @@ SELECT
   a.week AS week,
   a.total_doctor_count AS total_doctor_count,
   COALESCE(c.chat_doctor_count, 0) AS chat_doctor_count,
-  COALESCE(c.chat_doctor_count, 0) / a.total_doctor_count AS weekly_actuve_usage_rate
+  COALESCE(c.chat_doctor_count, 0) / a.total_doctor_count AS weekly_active_usage_rate
 FROM all_doctors a
 LEFT JOIN chat_users c ON a.week = c.week
 ORDER BY a.week
@@ -330,7 +330,7 @@ SELECT
   d.doctor_specialization AS doctor_specialization,
   COUNT(DISTINCT d.doctor_composite_id) AS total_doctors,
   ROUND(COUNT(DISTINCT CASE WHEN c.doctor_composite_id IS NOT NULL THEN d.doctor_composite_id ELSE NULL END) / COUNT(DISTINCT d.doctor_composite_id), 2) AS chat_used_rate,
-  ROUND(AVG(d.avg_bookings_per_week), 2) AS avg_bookings_per_doctor
+  ROUND(AVG(d.avg_bookings_per_week), 2) AS avg_weekly_bookings_per_doctor
 FROM all_doctors d
 LEFT JOIN chat_users c
   ON d.doctor_composite_id = c.doctor_composite_id
@@ -365,9 +365,7 @@ doctor_chat_status AS (
 )
 
 SELECT
-  CASE
-    WHEN d.is_chat_user = 1 THEN 'Chat Users' ELSE 'Non-Chat Users'
-  END AS user_group,
+  CASE WHEN d.is_chat_user = 1 THEN 'Chat Users' ELSE 'Non-Chat Users' END AS user_group,
   COUNT(DISTINCT b.doctor_composite_id) AS doctor_count,
   ROUND(AVG(b.avg_bookings_per_week), 2) AS avg_bookings_per_week,
   SUM(b.total_bookings) AS total_bookings
@@ -384,6 +382,41 @@ ORDER BY user_group
   <Column id=avg_bookings_per_week />
   <Column id=total_bookings />
 </DataTable>
+
+<Details title="SQL query used">
+
+```sql 
+WITH booking_metrics AS (
+  SELECT
+    CONCAT(country_code, '_', doctor_id) AS doctor_composite_id,
+    SUM(bookings) AS total_bookings,
+    AVG(bookings) AS avg_bookings_per_week
+  FROM chat.doctors
+  GROUP BY doctor_composite_id
+),
+
+doctor_chat_status AS (
+  SELECT
+    CONCAT(country_code, '_', doctor_id) AS doctor_composite_id,
+    CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END AS is_chat_user
+  FROM chat.messages
+  WHERE sender = 'doctor' OR (sender = 'patient' AND message_status = 'read')
+  GROUP BY doctor_composite_id
+)
+
+SELECT
+  CASE WHEN d.is_chat_user = 1 THEN 'Chat Users' ELSE 'Non-Chat Users' END AS user_group,
+  COUNT(DISTINCT b.doctor_composite_id) AS doctor_count,
+  ROUND(AVG(b.avg_bookings_per_week), 2) AS avg_bookings_per_week,
+  SUM(b.total_bookings) AS total_bookings
+FROM booking_metrics b
+LEFT JOIN doctor_chat_status d
+  ON b.doctor_composite_id = d.doctor_composite_id
+GROUP BY user_group
+ORDER BY user_group
+```
+
+</Details>
 
 ## Key Insights
 - **Clear value proposition**: Doctors who use chat receive approximately 8.5x more bookings than those who don't, demonstrating a strong business case for the feature.
